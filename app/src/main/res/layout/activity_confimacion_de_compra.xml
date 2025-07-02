@@ -1,0 +1,116 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Imagen del medicamento -->
+        <ImageView
+            android:id="@+id/imagenMedicamento"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_medicamento"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="Imagen medicamento" />
+
+        <!-- Nombre del medicamento -->
+        <TextView
+            android:id="@+id/nombreMedicamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paracetamol 500 mg"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Contador y precio -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnMenos"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="−"
+                android:textColor="@color/black"
+                android:background="#DDDDDD"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/txtCantidad"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="1"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnMas"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="+"
+                android:textColor="@color/black"
+                android:background="#DDDDDD"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtPrecio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S/10.00"
+                android:textSize="16sp"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <!-- Campos de texto -->
+        <EditText
+            android:id="@+id/edtDireccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Dirección de entrega"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_edittext"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/edtContacto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Número de contacto"
+            android:inputType="phone"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edittext"
+            android:padding="12dp" />
+
+        <!-- Total -->
+        <TextView
+            android:id="@+id/txtTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total : S/10.00"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Botón de WhatsApp -->
+        <Button
+            android:id="@+id/btnWhatsApp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enviar pedido por WhatsApp"
+            android:background="#25D366"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:drawableTint="@drawable/ic_whatsapp"
+            android:drawablePadding="8dp" />
+
+    </LinearLayout>
+</ScrollView>
