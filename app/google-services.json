@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "467838045319",
+    "firebase_url": "https://medialert-6a7f4-default-rtdb.firebaseio.com",
+    "project_id": "medialert-6a7f4",
+    "storage_bucket": "medialert-6a7f4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467838045319:android:e057e2ebf1f99fc4fabc22",
+        "android_client_info": {
+          "package_name": "com.pauloramos.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMn0q5tJii7-QeL_-6U6AGMK7X28f3xls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,4 +6,18 @@
     <color name="text_dark">#000000</color>
     <color name="text_medium">#616161</color>
     <color name="hint_color">#9E9E9E</color>
+    <color name="celeste">#00BFFF</color>
+    <color name="azul">#0000CD</color>
+    <color name="transparent">#00RRGGBB</color>
+    <color name="green_button_color">#4CAF50</color>
+    <color name="green_status">#4CAF50</color>
+    <color name="orange_status">#FF9800</color>
+    <color name="red_status">#F44336</color>
+    <color name="default_status">#CCCCCC</color>
+    <color name="piel">#FFF5EE</color>
+    <color name="azul_marino">#4169E1</color>
+    <color name="gris">#CCC</color>
+    <color name="grismore">#8F8F8F</color>
+    <color name="verde">#32CD32</color>
+    <color name="purple_700">#3700B3</color>
 </resources>

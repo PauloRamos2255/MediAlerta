@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:background="#303F9F"
+    android:padding="20dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <!-- Contenedor de la imagen con cámara superpuesta -->
+    <FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp">
+
+        <!-- CardView para sombra y forma circular -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card_view:cardCornerRadius="10dp"
+            card_view:cardElevation="4dp"
+            card_view:cardPreventCornerOverlap="true"
+            card_view:cardUseCompatPadding="true">
+
+            <!-- Imagen circular del usuario -->
+            <ImageView
+                android:id="@+id/imageViewUser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/defaultplaceholder"
+                android:contentDescription="Foto de perfil" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Icono de cámara superpuesto -->
+        <ImageView
+            android:id="@+id/imageViewCamera"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="6dp"
+            android:background="@drawable/circle_white"
+            android:src="@drawable/baseline_camera_alt_24"
+            android:padding="6dp"
+            android:elevation="8dp"
+            android:contentDescription="Cambiar foto" />
+    </FrameLayout>
+
+    <!-- Espacio entre imagen y textos -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
+
+        <!-- Nombre -->
+        <TextView
+            android:id="@+id/textViewUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tu nombre"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/textViewSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tu subtítulo aquí"
+            android:textColor="#CCCCCC"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+</LinearLayout>
