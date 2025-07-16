@@ -297,6 +297,8 @@ public class Menu_Principal extends AppCompatActivity implements NavigationView.
             startActivity(new Intent(this, Historial.class));
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, Ajuste.class));
+        } else if (id == R.id.nav_compra) {
+            startActivity(new Intent(this,compra.class));
         }
 
         drawerLayout.closeDrawer(navigationView);

@@ -2,19 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+
+
+    <!-- Requiere cámara -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -26,66 +29,45 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
+
+        <!-- Receiver que maneja la alarma -->
+        <receiver
+            android:name=".AlarmaReceiver"
+            android:exported="true" /> <!-- necesario si la alarma viene del sistema -->
+
+        <!-- Actividad que se puede lanzar desde el receiver si deseas mostrar pantalla -->
         <activity
             android:name=".Vista_alarma"
-            android:exported="false" />
+            android:exported="true" /> <!-- debe ser true si se lanzará desde el receiver -->
+
+        <!-- Activity de inicio -->
         <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RecuperacionExitosaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CambiarClaveActivity"
-            android:exported="false" />
-        <activity
-            android:name=".VerificarCodigoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RecuperarPorTelefonoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RecuperarClaveActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Registro_Usuario"
-            android:exported="false" />
-        <activity
-            android:name=".Foto"
-            android:exported="false" />
-        <activity
-            android:name=".Camara"
-            android:exported="false" />
-        <activity
-            android:name=".Login"
-            android:exported="false" />
-        <activity
-            android:name=".compra"
-            android:exported="false" />
-        <activity
-            android:name=".Confimacion_de_compra"
-            android:exported="false" />
-        <activity
-            android:name=".Ajuste"
-            android:exported="false" />
-        <activity
-            android:name=".Historial"
-            android:exported="false" />
-        <activity
-            android:name=".Generar_alarma"
-            android:exported="false" />
-        <activity
-            android:name=".Menu_Principal"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
+
+        <!-- Resto de tus actividades -->
+        <activity android:name=".RecuperacionExitosaActivity" android:exported="false" />
+        <activity android:name=".CambiarClaveActivity" android:exported="false" />
+        <activity android:name=".VerificarCodigoActivity" android:exported="false" />
+        <activity android:name=".RecuperarPorTelefonoActivity" android:exported="false" />
+        <activity android:name=".RecuperarClaveActivity" android:exported="false" />
+        <activity android:name=".Registro_Usuario" android:exported="false" />
+        <activity android:name=".Foto" android:exported="false" />
+        <activity android:name=".Camara" android:exported="false" />
+        <activity android:name=".Login" android:exported="false" />
+        <activity android:name=".compra" android:exported="false" />
+        <activity android:name=".Confimacion_de_compra" android:exported="false" />
+        <activity android:name=".Ajuste" android:exported="false" />
+        <activity android:name=".Historial" android:exported="false" />
+        <activity android:name=".Generar_alarma" android:exported="false" />
+        <activity android:name=".Menu_Principal" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+
     </application>
 
 </manifest>

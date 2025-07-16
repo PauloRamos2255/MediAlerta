@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -29,31 +30,20 @@ public class Ajuste extends AppCompatActivity {
 
     private SharedPreferences prefs;
     private static final int REQUEST_NOTIFICATION_PERMISSION = 1001;
-    private static final int REQUEST_CODE_TONO = 1001;
-
-
+    private static final int REQUEST_TONO_PERSONALIZADO = 101;
 
     private Handler handlerRepeticion = new Handler();
     private Runnable repetirPreview;
     private boolean dialogoAbierto = false;
 
     private MediaPlayer mediaPlayer;
-    private int tonoSeleccionadoIndex = -1;
     private String tonoSeleccionadoTemp = "";
-    private Uri tonoPersonalizadoUri = null;
-    private boolean seleccionPersonalizada = false;
-    private String nombreArchivoPersonalizado = "";
     private AlertDialog alertDialog;
-
-    private static final int REQUEST_TONO_PERSONALIZADO = 101;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ajuste);
-
-
 
         prefs = getSharedPreferences("configuraciones", MODE_PRIVATE);
 
@@ -65,16 +55,9 @@ public class Ajuste extends AppCompatActivity {
         switchNotificaciones.setChecked(notificacionesActivas);
 
         switchNotificaciones.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("notificaciones_activadas", isChecked);
-            editor.apply();
-        });
-
-        switchNotificaciones.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                         != PackageManager.PERMISSION_GRANTED) {
-
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.POST_NOTIFICATIONS},
                             REQUEST_NOTIFICATION_PERMISSION);
@@ -94,45 +77,36 @@ public class Ajuste extends AppCompatActivity {
         opcionTono.setOnClickListener(v -> mostrarDialogoTonoPersonalizado());
     }
 
-
     private void guardarEstadoNotificacion(boolean estado) {
-        SharedPreferences.Editor editor = getSharedPreferences("configuraciones", MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("notificaciones_activadas", estado);
         editor.apply();
     }
 
     private void mostrarDialogoIdioma() {
-
-
         String[] idiomas = {"Español", "Inglés", "Portugués"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Selecciona un idioma")
+        new AlertDialog.Builder(this)
+                .setTitle("Selecciona un idioma")
                 .setItems(idiomas, (dialog, which) -> {
                     String idiomaSeleccionado = idiomas[which];
-
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString("idioma_seleccionado", idiomaSeleccionado);
-                    editor.apply();
-
+                    prefs.edit().putString("idioma_seleccionado", idiomaSeleccionado).apply();
                     Toast.makeText(this, "Idioma seleccionado: " + idiomaSeleccionado, Toast.LENGTH_SHORT).show();
-                });
-        builder.create().show();
+                })
+                .show();
     }
 
-
     private void mostrarDialogoTonoPersonalizado() {
-        dialogoAbierto = true;
-        prefs = getSharedPreferences("configuraciones", MODE_PRIVATE);
         tonoSeleccionadoTemp = prefs.getString("tono_seleccionado", "");
         String nombreGuardado = prefs.getString("nombre_tono_personalizado", "");
 
         List<String> listaTonos = new ArrayList<>(Arrays.asList("Tono 1", "Tono 2", "Tono 3"));
-        String opcionPersonalizada = nombreGuardado.isEmpty() ? "Seleccionar desde almacenamiento"
+        String opcionPersonalizada = nombreGuardado.isEmpty()
+                ? "Seleccionar desde almacenamiento"
                 : "Tono personalizado: " + nombreGuardado;
         listaTonos.add(opcionPersonalizada);
         String[] tonos = listaTonos.toArray(new String[0]);
 
+        // Determinar la posición seleccionada
         int posicionSeleccionada = -1;
         switch (tonoSeleccionadoTemp) {
             case "tono1": posicionSeleccionada = 0; break;
@@ -147,10 +121,7 @@ public class Ajuste extends AppCompatActivity {
         builder.setTitle("Selecciona un tono de alarma");
 
         builder.setSingleChoiceItems(tonos, posicionSeleccionada, (dialog, which) -> {
-            if (mediaPlayer != null) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
+            liberarMediaPlayer(); // Prevenir duplicación
 
             switch (which) {
                 case 0:
@@ -166,31 +137,22 @@ public class Ajuste extends AppCompatActivity {
                     tonoSeleccionadoTemp = "tono3";
                     break;
                 case 3:
-                    abrirSelectorDeArchivo(); // NO cerrar el diálogo
+                    abrirSelectorDeArchivo(); // No cerrar el diálogo aún
                     return;
             }
 
             if (mediaPlayer != null) {
                 mediaPlayer.start();
-                new Handler().postDelayed(() -> {
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        mediaPlayer.stop();
-                        mediaPlayer.release();
-                        mediaPlayer = null;
-                        Toast.makeText(this, "Reproducción detenida automáticamente", Toast.LENGTH_SHORT).show();
-                    }
-                }, 60000);
 
-                repetirPreview = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (dialogoAbierto && mediaPlayer != null) {
-                            try {
-                                mediaPlayer.seekTo(0);
-                                mediaPlayer.start();
-                                handlerRepeticion.postDelayed(this, 20000);
-                            } catch (Exception ignored) {}
-                        }
+                new Handler().postDelayed(this::liberarMediaPlayer, 60000); // Detener a los 60s
+
+                repetirPreview = () -> {
+                    if (dialogoAbierto && mediaPlayer != null) {
+                        try {
+                            mediaPlayer.seekTo(0);
+                            mediaPlayer.start();
+                            handlerRepeticion.postDelayed(repetirPreview, 20000);
+                        } catch (Exception ignored) {}
                     }
                 };
                 handlerRepeticion.postDelayed(repetirPreview, 20000);
@@ -198,31 +160,26 @@ public class Ajuste extends AppCompatActivity {
         });
 
         builder.setPositiveButton("Aceptar", (dialog, which) -> {
-            dialogoAbierto = false;
-            handlerRepeticion.removeCallbacks(repetirPreview);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("tono_seleccionado", tonoSeleccionadoTemp);
-            editor.apply();
-            Toast.makeText(this, "Tono guardado: " + tonoSeleccionadoTemp, Toast.LENGTH_SHORT).show();
-            if (mediaPlayer != null) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
+            prefs.edit().putString("tono_seleccionado", tonoSeleccionadoTemp).apply();
+            Toast.makeText(this, "Tono guardado", Toast.LENGTH_SHORT).show();
         });
 
         builder.setNegativeButton("Cancelar", (dialog, which) -> {
-            dialogoAbierto = false;
-            handlerRepeticion.removeCallbacks(repetirPreview);
-            if (mediaPlayer != null) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
-            dialog.dismiss();
+            Toast.makeText(this, "Selección cancelada", Toast.LENGTH_SHORT).show();
         });
 
         alertDialog = builder.create();
+
+        alertDialog.setOnDismissListener(dialog -> {
+            dialogoAbierto = false;
+            handlerRepeticion.removeCallbacks(repetirPreview);
+            liberarMediaPlayer();
+        });
+
+        dialogoAbierto = true;
         alertDialog.show();
     }
+
 
     private void abrirSelectorDeArchivo() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -241,54 +198,103 @@ public class Ajuste extends AppCompatActivity {
                 tonoSeleccionadoTemp = uri.toString();
                 String nombreArchivo = obtenerNombreArchivo(uri);
 
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("tono_seleccionado", tonoSeleccionadoTemp);
-                editor.putString("nombre_tono_personalizado", nombreArchivo);
-                editor.apply();
+                prefs.edit()
+                        .putString("tono_seleccionado", tonoSeleccionadoTemp)
+                        .putString("nombre_tono_personalizado", nombreArchivo)
+                        .apply();
 
                 try {
+                    liberarMediaPlayer();
                     mediaPlayer = new MediaPlayer();
                     mediaPlayer.setDataSource(this, uri);
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
+                    mediaPlayer.setOnPreparedListener(mp -> {
+                        mp.start();
 
-                    new Handler().postDelayed(() -> {
-                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                            mediaPlayer.stop();
-                            mediaPlayer.release();
-                            mediaPlayer = null;
-                        }
-                    }, 60000);
+                        new Handler().postDelayed(this::liberarMediaPlayer, 60000);
+
+                        repetirPreview = () -> {
+                            if (dialogoAbierto && mediaPlayer != null) {
+                                try {
+                                    mediaPlayer.seekTo(0);
+                                    mediaPlayer.start();
+                                    handlerRepeticion.postDelayed(repetirPreview, 20000);
+                                } catch (Exception ignored) {}
+                            }
+                        };
+                        handlerRepeticion.postDelayed(repetirPreview, 20000);
+                    });
+                    mediaPlayer.prepareAsync();
 
                     Toast.makeText(this, "Tono personalizado seleccionado", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Toast.makeText(this, "Error al reproducir el tono", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Log.e("TONO", "Error: ", e);
                 }
 
-                // Reabrir el diálogo si fue cerrado
-                mostrarDialogoTonoPersonalizado();
+                // 🔄 Actualiza el diálogo si aún está abierto
+                if (alertDialog != null && alertDialog.isShowing()) {
+                    alertDialog.dismiss();
+                    new Handler().postDelayed(this::mostrarDialogoTonoPersonalizado, 300);
+                }
             }
         }
     }
+
 
     private String obtenerNombreArchivo(Uri uri) {
         String nombre = "";
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int nombreIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            if (nombreIndex >= 0) {
-                nombre = cursor.getString(nombreIndex);
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    int nombreIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nombreIndex >= 0) {
+                        nombre = cursor.getString(nombreIndex);
+                    }
+                }
+            } finally {
+                cursor.close();
             }
-            cursor.close();
         }
         return nombre;
     }
 
+    private void liberarMediaPlayer() {
+        if (mediaPlayer != null) {
+            try {
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    mp.start();
+
+                    repetirPreview = () -> {
+                        if (dialogoAbierto && mediaPlayer != null) {
+                            try {
+                                mediaPlayer.seekTo(0);
+                                mediaPlayer.start();
+                                handlerRepeticion.postDelayed(repetirPreview, 20000);
+                            } catch (Exception ignored) {}
+                        }
+                    };
+
+                    handlerRepeticion.postDelayed(repetirPreview, 20000);
+
+                    new Handler().postDelayed(this::liberarMediaPlayer, 60000);
+                });
+
+                mediaPlayer.prepareAsync(); // <- importante para tonos personalizados
+            } catch (Exception e) {
+                Toast.makeText(this, "No se pudo reproducir el tono", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        }
+
+    }
 
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dialogoAbierto = false;
+        handlerRepeticion.removeCallbacks(repetirPreview);
+        liberarMediaPlayer();
+    }
 }
